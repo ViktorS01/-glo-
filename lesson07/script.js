@@ -18,13 +18,43 @@ let appData = {
     addIncome: [],
     expenses: {},
     addExpenses: [],
+    persentDeposit: 0,
+    moneyDeposit: 0,
     deposit: false,
     mission: 500000,
-    period: 12,
+    period: 3,
     asking: function(){
-        let addExpenses = prompt('Перечислите возможные расходы через запятую:');
+
+        if (confirm("Есть ли у вас доп. заработок?")){
+            let itemIncome,
+                cashIncome;
+            do {
+                itemIncome = prompt("Какой у вас дополнительный заработок?", "Таксую");
+            }
+        
+            while(itemIncome === null || itemIncome.trim() === '' || !isNaN(itemIncome));
+
+            do {
+                cashIncome = prompt("Сколько в месяц зарабатываете на этом?", 10000);
+            }
+        
+            while(cashIncome === null || cashIncome.trim() === '' || isNaN(cashIncome));
+
+            appData.income[itemIncome] = cashIncome;
+        }
+
+
+        let addExpenses;
+
+        do {
+            addExpenses = prompt('Перечислите возможные расходы через запятую:');
+        }
+    
+        while(addExpenses === null || addExpenses.trim() === '' || !isNaN(addExpenses));
+
         appData.addExpenses = addExpenses.toLowerCase().split(",");
         appData.deposit = confirm("Есть ли у вас депозит в банке?");
+
         let sum = 0;
         let answer = '';
         for (let i = 1; i <= 2; i++){
@@ -86,6 +116,29 @@ let appData = {
         return Math.ceil(appData.mission / accumulatedMonth) > 0 ? "Цель будет достигнута за " + Math.ceil(appData.mission / accumulatedMonth)  + " месяцев." : "Цель не будет достигнута";
     },
 
+    getInfoDeposit: function(){
+        if (appData.deposit){
+            do {
+                appData.persentDeposit = prompt("Какой годовой процент?", '10');
+            }
+        
+            while(appData.persentDeposit === null || appData.persentDeposit.trim() === '' ||
+                !isNaN(appData.persentDeposit));
+
+            do {
+                appData.moneyDeposit = prompt("Какая сумма заложена?", 10000);
+            }
+        
+            while(appData.moneyDeposit === null || appData.moneyDeposit.trim() === '' || isNaN(appData.moneyDeposit));
+
+            
+        }
+    },
+
+    calkSavedMoney: function(){
+        return appData.budgetMonth * appData.period;
+    }
+
 
 };
 
@@ -102,3 +155,16 @@ console.log(appData.getBudget());
 // for (let key in appData){
 //     console.log("Свойство: " + key + " со значением: " + appData[key]);
 // }
+
+// appData.getInfoDeposit();
+// console.log(appData.calkSavedMoney, appData.persentDeposit, appData.moneyDeposit);
+
+let expensesString = '';
+appData.addExpenses.forEach((element, index) => {
+    expensesString += element[0].toUpperCase() + element.substring(1);
+    if (index !== appData.addExpenses.length - 1){
+        expensesString += ', ';
+    }
+});
+
+console.log(expensesString);
