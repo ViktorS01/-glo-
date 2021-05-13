@@ -51,6 +51,7 @@ let appData = {
         appData.getExpenses();
         appData.getIncome();
         appData.getExpensesMonth();
+        appData.getIncomeMonth();
         appData.getAddExpenses();
         appData.getAddIncome();
 
@@ -93,10 +94,6 @@ let appData = {
             if (itemIncome !== '' && cashIncome !== ''){
                 appData.income[itemIncome] = +cashIncome;
             }
-
-            for (let key in appData.income){
-                appData.incomeMonth += +appData.income[key];
-            }
         });
     },
     getAddExpenses: function(){
@@ -132,22 +129,15 @@ let appData = {
         }
         this.expensesMonth = sum;
     },
+    getIncomeMonth: function (){
+        let sum = 0;
+        for (let item in appData.income){
+            sum += appData.income[item];
+        }
+        this.incomeMonth = sum;
+    },
     getBudget: function (){
-
-        let summa = 0;
-
-        const sum = function(){
-            let summ = 0;
-            for (let key in appData.expenses){
-                summ += +appData.expenses[key];
-            }
-            return summ;
-        };
-
-        summa = sum();
-
-        this.budgetMonth =  this.budget + appData.incomeMonth - summa;
-
+        this.budgetMonth =  this.budget + appData.incomeMonth - appData.expensesMonth;
         this.budgetDay = Math.floor(this.budgetMonth / 12);
     },
     getTargetMonth: function (){
@@ -168,16 +158,12 @@ let appData = {
             }
         
             while(appData.moneyDeposit === null || appData.moneyDeposit.trim() === '' || isNaN(appData.moneyDeposit));
-
-            
         }
     },
 
     calkPeriod: function(){
         return appData.budgetMonth * range.value;
     }
-
-
 };
 
 // buttonStart.setAttribute('disabled', true);
@@ -210,18 +196,3 @@ range.addEventListener('mouseup', ()=>{
     periodAmount.textContent = range.value;
     appData.showResult();
 });
-
-// console.log("Наша программа включает в себя данные: ");
-// for (let key in appData){
-//     console.log("Свойство: " + key + " со значением: " + appData[key]);
-// }
-
-// let expensesString = '';
-// appData.addExpenses.forEach((element, index) => {
-//     expensesString += element[0].toUpperCase() + element.substring(1);
-//     if (index !== appData.addExpenses.length - 1){
-//         expensesString += ', ';
-//     }
-// });
-
-// console.log(expensesString);
