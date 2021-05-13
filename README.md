@@ -5,3 +5,5 @@ https://viktors01.github.io/-glo-/toDo/
 https://viktors01.github.io/-glo-/budget_app/
 
 https://viktors01.github.io/-glo-/сlock/
+
+https://viktors01.github.io/-glo-/ColorRandom/
