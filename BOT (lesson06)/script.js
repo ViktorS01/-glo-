@@ -46,7 +46,7 @@ const startBot = function (){
         }
     };
 
-    return whatIsNum (prompt("Guess a number from 1 before 100"));
+    return whatIsNum (prompt("Guess a number from 1 to 100"));
 };
 
 startBot ();
