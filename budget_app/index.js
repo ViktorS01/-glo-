@@ -28,7 +28,9 @@ let buttonStart = document.getElementById('start'),
 
     range = document.querySelector('.period-select'),
     periodAmount = document.querySelector(".period-amount"),
-    incomeItem = document.querySelectorAll('.income-items');
+    incomeItem = document.querySelectorAll('.income-items'),
+    inputElems = document.querySelectorAll('input[type=text]'),
+    cancelButton = document.getElementById('cancel');
 
 let accumulatedMonth;
 
@@ -45,18 +47,26 @@ let appData = {
     persentDeposit: 0,
     moneyDeposit: 0,
     deposit: false,
+    
     start: function (){
-        appData.budget = +incomeMonthInput.value;
+        this.budget = +incomeMonthInput.value;
         
-        appData.getExpenses();
-        appData.getIncome();
-        appData.getExpensesMonth();
-        appData.getIncomeMonth();
-        appData.getAddExpenses();
-        appData.getAddIncome();
+        this.getExpenses();
+        this.getIncome();
+        this.getExpensesMonth();
+        this.getIncomeMonth();
+        this.getAddExpenses();
+        this.getAddIncome();
 
-        appData.getBudget();
-        appData.showResult();
+        this.getBudget();
+        this.showResult();
+
+        inputElems.forEach(function (item){
+            item.setAttribute('disabled', '');
+        });
+
+        buttonStart.style.display = 'none';
+        cancelButton.style.display = 'block';
     },
     addExpensesBlock: function (){
         let cloneExpensesItem = expensesItems[0].cloneNode(true);
@@ -114,85 +124,94 @@ let appData = {
         });
     },
     showResult: function (){
-        incomeMonth.value = appData.budgetMonth;
-        budgetDay.value = appData.budgetDay;
-        expensesMonth.value = appData.expensesMonth;
-        possibleExpense.value = appData.addExpenses.join(',');
-        possibleIncome.value = appData.addIncome.join(',');
-        targetDate.value = Math.ceil(appData.getTargetMonth());
-        accumulation.value = appData.calkPeriod();
+        incomeMonth.value = this.budgetMonth;
+        budgetDay.value = this.budgetDay;
+        expensesMonth.value = this.expensesMonth;
+        possibleExpense.value = this.addExpenses.join(',');
+        possibleIncome.value = this.addIncome.join(',');
+        targetDate.value = Math.ceil(this.getTargetMonth());
+        accumulation.value = this.calkPeriod();
     },
     getExpensesMonth: function (){
         let sum = 0;
-        for (let item in appData.expenses){
-            sum += appData.expenses[item];
+        for (let item in this.expenses){
+            sum += this.expenses[item];
         }
         this.expensesMonth = sum;
     },
     getIncomeMonth: function (){
         let sum = 0;
-        for (let item in appData.income){
-            sum += appData.income[item];
+        for (let item in this.income){
+            sum += this.income[item];
         }
         this.incomeMonth = sum;
     },
     getBudget: function (){
-        this.budgetMonth =  this.budget + appData.incomeMonth - appData.expensesMonth;
-        this.budgetDay = Math.floor(this.budgetMonth / 12);
+        this.budgetMonth =  appData.budget + appData.incomeMonth - appData.expensesMonth;
+        this.budgetDay = Math.floor(this.budgetMonth / 30);
     },
     getTargetMonth: function (){
-        return target.value / appData.budgetMonth;
+        return target.value / this.budgetMonth;
     },
 
     getInfoDeposit: function(){
-        if (appData.deposit){
+        if (this.deposit){
             do {
-                appData.persentDeposit = prompt("Какой годовой процент?", '10');
+                this.persentDeposit = prompt("Какой годовой процент?", '10');
             }
         
-            while(appData.persentDeposit === null || appData.persentDeposit.trim() === '' ||
-                !isNaN(appData.persentDeposit));
+            while(this.persentDeposit === null || this.persentDeposit.trim() === '' ||
+                !isNaN(this.persentDeposit));
 
             do {
-                appData.moneyDeposit = prompt("Какая сумма заложена?", 10000);
+                this.moneyDeposit = prompt("Какая сумма заложена?", 10000);
             }
         
-            while(appData.moneyDeposit === null || appData.moneyDeposit.trim() === '' || isNaN(appData.moneyDeposit));
+            while(this.moneyDeposit === null || this.moneyDeposit.trim() === '' || isNaN(this.moneyDeposit));
         }
     },
 
     calkPeriod: function(){
-        return appData.budgetMonth * range.value;
-    }
+        return this.budgetMonth * range.value;
+    },
+    updateRange: function(){
+        periodAmount.textContent = event.target.value;
+    },
+
+    reset: function (){
+        incomeMonth.value = 0;
+        budgetDay.value = 0;
+        expensesMonth.value = 0;
+        possibleExpense.value = 'Наименование';
+        possibleIncome.value = 'Наименование';
+        targetDate.value = 0;
+        accumulation.value = 0;
+
+        inputElems.forEach (function (item){
+            item.removeAttribute('disabled');
+        });
+
+        buttonStart.style.display = 'block';
+        cancelButton.style.display = 'none';
+    },
 };
-
-// buttonStart.setAttribute('disabled', true);
-
-// const start = function (){
-//     if (incomeMonthInput.value !== ''){
-//         buttonStart.setAttribute('disabled', false);
-//     }
-//     else{
-//         buttonStart.setAttribute('disabled', true);
-//     }
-// };
-
-// incomeMonthInput.addEventListener ('input', () => {
-//     if (incomeMonthInput.value !== ''){
-//         buttonStart.setAttribute('disabled', false);
-//     }
-//     else{
-//         buttonStart.setAttribute('disabled', true);
-//     }
-// });
-
-buttonStart.addEventListener('click', appData.start);
+buttonStart.addEventListener('click', function (){
+    if (incomeMonthInput.value !== '')
+    { 
+        appData.start();
+    }
+});
 
 buttonPlus1.addEventListener('click', appData.addExpensesBlock);
 
 buttonPlus0.addEventListener('click', appData.addIncomeBlock);
 
-range.addEventListener('mouseup', ()=>{
-    periodAmount.textContent = range.value;
-    appData.showResult();
+range.addEventListener('input', function(){
+    accumulation.value = appData.calkPeriod();
 });
+
+range.addEventListener('input', function (event){
+    appData.updateRange(event);
+});
+
+cancelButton.addEventListener('click', appData.reset);
